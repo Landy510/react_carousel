@@ -7,6 +7,10 @@ body {
   height: 100vh;
 }
 
+img {
+  width: 100%;
+}
+
 .container {
   overflow: hidden;
   width: 100%;
@@ -22,7 +26,6 @@ body {
 .page {
   flex: calc(25% - 20px) 0 0;
   margin: 10px;
-  height: 300px;
   border-radius: 50%;
 }
 

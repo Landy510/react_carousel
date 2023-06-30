@@ -4,19 +4,23 @@ import './App.css'
 const source = [
   {
     id: 0,
-    bgc: 'rgb(255, 10, 0)'
+    bgc: 'rgb(255, 10, 0)',
+    src: 'https://picsum.photos/id/230/200/300'
   },
   {
     id: 1,
-    bgc: 'rgb(255, 50, 0)'
+    bgc: 'rgb(255, 50, 0)',
+    src: 'https://picsum.photos/id/231/200/300'
   },
   {
     id: 2,
-    bgc: 'rgb(255, 150, 0)'
+    bgc: 'rgb(255, 150, 0)',
+    src: 'https://picsum.photos/id/232/200/300'
   },
   {
     id: 3,
-    bgc: 'rgb(255, 255, 50)'
+    bgc: 'rgb(255, 255, 50)',
+    src: 'https://picsum.photos/id/233/200/300'
   }
 ]
 
@@ -31,7 +35,8 @@ function App() {
       count = Math.floor(arr.length / total);
 
       for(let i = 0; i < total; i++) {
-        arr.push({id: count + '-' + i, bgc: source[i].bgc})
+        arr.push({id: count + '-' + i, bgc: source[i].bgc, src: source[i].src
+      })
       }
     }
 
@@ -66,11 +71,12 @@ function App() {
                 <div 
                   className='page' 
                   key={item.id}
-                  style={{
-                    backgroundColor: item.bgc
-                  }}
+                  // style={{
+                  //   backgroundColor: item.bgc
+                  // }}
                 >
-                  {item.id}
+                  {/* {item.id} */}
+                  <img src={item.src} alt="" />
                 </div>
               )
             })
