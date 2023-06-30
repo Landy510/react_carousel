@@ -1,0 +1,59 @@
+#root {
+  width: 100%;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+}
+
+.container {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-wrapper {
+  display: flex;
+  width: 100%;
+  margin-left: calc(-1 * 25% * 2.5);
+}
+
+.page {
+  flex: calc(25% - 20px) 0 0;
+  margin: 10px;
+  height: 300px;
+  border-radius: 50%;
+}
+
+.first {
+  background-color: rgb(255, 10, 0);
+}
+
+.second {
+  background-color: rgb(255, 200, 0);
+}
+
+.third {
+  background-color: rgb(255, 0, 200);
+}
+
+@media(max-width: 768px) {
+  .swiper-wrapper {
+    margin-left: calc(-1 * 50% * 3.5);
+  }
+
+  .page {
+    flex: calc(50% - 20px) 0 0;
+  }
+}
+
+@media(max-width: 568px) {
+  .swiper-wrapper {
+    margin-left: calc(-1 * 100% * 4);
+  }
+  
+  .page {
+    flex: calc(100% - 20px) 0 0;
+  }
+}
