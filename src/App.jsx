@@ -1,70 +1,66 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-
+import { v4 as uuidv4 } from 'uuid';
 const source = [
   {
-    id: 0,
+    id: uuidv4(),
     bgc: 'rgb(255, 10, 0)',
     src: 'https://picsum.photos/id/230/200/300'
   },
   {
-    id: 1,
+    id: uuidv4(),
     bgc: 'rgb(255, 50, 0)',
     src: 'https://picsum.photos/id/231/200/300'
   },
   {
-    id: 2,
+    id: uuidv4(),
     bgc: 'rgb(255, 150, 0)',
     src: 'https://picsum.photos/id/232/200/300'
   },
   {
-    id: 3,
+    id: uuidv4(),
     bgc: 'rgb(255, 255, 50)',
     src: 'https://picsum.photos/id/233/200/300'
   }
 ]
 
 function App() {
-  const [now, setNow] = useState(0);
-
   const containerRef = useRef(null);
   const isDrag = useRef(false);
   const startX = useRef(0);
   const startScrollLeft = useRef(0);
   const firstChildWidth = useRef(0);
 
+  const anchorPoint = useRef(3);
+  const swiperContainerRef = useRef(null);
+
   const directionRef = useRef('');
-  
+
   const allImages = () => {
-    const arr = [];
-    const total = source.length;
-    let count;
-    while(total > 0 && arr.length < 5 + 4) {
-      count = Math.floor(arr.length / total);
-
-      for(let i = 0; i < total; i++) {
-        arr.push({id: count + '-' + i, bgc: source[i].bgc, src: source[i].src
-      })
+    let arr = []
+    
+    arr = source.slice();
+    arr = [
+      ...arr.slice(-3),
+      ...arr,
+      ...arr.slice(0,3)
+    ].map(item => {
+      return {
+        ...item,
+        id: uuidv4()
       }
-    }
-
-    return arr;
-  }
-
-  const showImages = () => {
-    const start = now - 4;
-    return allImages().slice(start).concat(allImages().slice(0, start));
+    })
+    return arr
   }
 
   function handleChange(index, direction) {
-    directionRef.current = direction;
-    let limit = allImages().length - 1;
-    setNow(index < 0 ? limit : index > limit ? 0 : index);
-    // containerRef.current.scrollLeft += direction === 'prev' ? -firstChildWidth.current : +firstChildWidth.current
+    anchorPoint.current = index
+    directionRef.current = direction
+    swiperContainerRef.current.style.transform = `translateX(${anchorPoint.current * -firstChildWidth.current}px)`
   }
 
   const dragStart = (e) => {
-    isDrag.current = true;
+    isDrag.current = true; 
     containerRef.current.classList.add('dragging');
 
     startX.current = e.pageX;
@@ -82,11 +78,11 @@ function App() {
   }
 
   const infiniteScroll = () => {
-    console.log('Hello')
     if(containerRef.current.scrollLeft === 0) {
       console.log("you've reached the left end");
       containerRef.current.classList.add('no-transition');
-      containerRef.current.scrollLeft = containerRef.current.scrollWidth - ( 2 * containerRef.current.offsetWidth );
+      // containerRef.current.scrollLeft = containerRef.current.scrollWidth - ( 2 * containerRef.current.offsetWidth );
+      swiperContainerRef.current.style.transform = `translate3d(${-2 * firstChildWidth.current}px, 0, 0)`
       containerRef.current.classList.remove('no-transition');
     }
     else if(Math.ceil(containerRef.current.scrollLeft) === (containerRef.current.scrollWidth - containerRef.current.offsetWidth)) {
@@ -97,12 +93,57 @@ function App() {
     }
   }
 
+  function checkPos() {
+    console.group('swiper coordination info')
+    console.log('checkPos? ', swiperContainerRef.current.getBoundingClientRect())
+    console.log('left? ', Math.round(Math.abs(swiperContainerRef.current.getBoundingClientRect().left)))
+    console.log('right? ', Math.round(Math.abs(swiperContainerRef.current.style.right)))
+    console.log('width? ', Math.round(Math.abs(swiperContainerRef.current.clientWidth)))
+    console.log('scrollLeft ', swiperContainerRef.current.style.transform)
+    console.log('scrollWidth ', swiperContainerRef.current.scrollWidth)
+    console.groupEnd()
+    if(
+      directionRef.current === 'next' && 
+      Math.round(Math.abs(swiperContainerRef.current.getBoundingClientRect().left)) === Math.round(Math.abs(swiperContainerRef.current.getBoundingClientRect().width))
+    ) {
+      // if swiperContainer touched its right end, this block will be processed
+      console.log('right end')
+      swiperContainerRef.current.style.transition = 'none';
+      const shiftDistance = swiperContainerRef.current.getBoundingClientRect().left + 4 * firstChildWidth.current;
+      swiperContainerRef.current.style.transform = `translateX(${shiftDistance}px)`;
+      
+      anchorPoint.current -= 4;
+      setTimeout(() => {
+        swiperContainerRef.current.style.transition = 'transform .5s';
+      }, 0)
+    }
+    else if(
+      directionRef.current === 'prev' && 
+      swiperContainerRef.current.getBoundingClientRect().left >= 0
+    ) {
+      // if swiperContainer touched its left end, this block will be processed
+      console.log('leftt end')
+      swiperContainerRef.current.style.transition = 'none';
+      const shiftDistance = swiperContainerRef.current.getBoundingClientRect().left - 4 * firstChildWidth.current;
+      swiperContainerRef.current.style.transform = `translateX(${shiftDistance}px)`;
+
+      anchorPoint.current += 4;
+      setTimeout(() => {
+        swiperContainerRef.current.style.transition = 'transform .5s';
+      }, 0)
+    }
+  }
+
   useEffect(() => {
     containerRef.current.addEventListener('mousedown', dragStart)
     containerRef.current.addEventListener('mousemove', dragging)
     containerRef.current.addEventListener('scroll', infiniteScroll)
+    swiperContainerRef.current.addEventListener('transitionend', checkPos)
     document.addEventListener('mouseup', dragStop)
-    firstChildWidth.current = containerRef.current.children[0].children[0].offsetWidth;
+
+    firstChildWidth.current = swiperContainerRef.current.children[0].getBoundingClientRect().width;
+    swiperContainerRef.current.style.transform = `translateX(${anchorPoint.current * -firstChildWidth.current}px)`; 
+    
 
     return () => {
       containerRef.current.removeEventListener('mousemove', dragging);
@@ -111,26 +152,22 @@ function App() {
     }
   }, [])
 
-  useEffect(() => {
-    containerRef.current.scrollLeft += directionRef.current === 'prev' ? -firstChildWidth.current : +firstChildWidth.current
-  }, [now])
-
   return (
     <>
       <div style={{
         textAlign: 'center'
       }}>
-        <button onClick={() => handleChange(now - 1, 'prev')} >Prev</button>
-        <button onClick={() => handleChange(now + 1, 'next')}>Next</button>
+        <button onClick={() => handleChange(anchorPoint.current - 1, 'prev')} >Prev</button>
+        <button onClick={() => handleChange(anchorPoint.current + 1, 'next')}>Next</button>
       </div>
 
       <div 
         className="container"
         ref={containerRef}
       >
-        <div className="swiper-wrapper">
+        <div className="swiper-wrapper" ref={swiperContainerRef}>
           {
-            showImages().map(item => {
+            allImages().map(item => {
               return (
                 <div 
                   className='page' 

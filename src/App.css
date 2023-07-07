@@ -13,14 +13,14 @@ img {
 }
 
 .container {
-  /* overflow: hidden; */
+  overflow: hidden;
   width: 100%;
   height: 100%;
   
-  overflow-x: auto;
+  /* overflow-x: auto; */
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  scrollbar-width: 0;
+  scrollbar-width: none;
 }
 
 .container::-webkit-scrollbar {
@@ -44,15 +44,20 @@ img {
 .swiper-wrapper {
   display: flex;
   width: 100%;
+  transition: transform .5s;
   /* margin-right: calc(-1 * 25% * 2.5); */
+}
+
+.swiper-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .page {
   flex: calc(25% - 20px) 0 0;
-  margin: 10px;
+  padding: 10px;
   border-radius: 50%;
 
-  scroll-snap-align: center;
+  scroll-snap-align: start;
 }
 
 .first {
