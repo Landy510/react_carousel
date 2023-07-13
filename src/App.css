@@ -1,5 +1,8 @@
 #root {
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 body {
@@ -15,9 +18,8 @@ img {
 .container {
   overflow: hidden;
   width: 100%;
-  height: 100%;
+  flex-grow: 1;
   
-  /* overflow-x: auto; */
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;
@@ -53,7 +55,8 @@ img {
 }
 
 .page {
-  flex: calc(25% - 20px) 0 0;
+  /* flex: calc(25% - 20px) 0 0; */
+  flex: calc(33.33333% - 20px) 0 0;
   padding: 10px;
   border-radius: 50%;
 
@@ -73,20 +76,12 @@ img {
 }
 
 @media(max-width: 768px) {
-  .swiper-wrapper {
-    margin-left: calc(-1 * 50% * 3.5);
-  }
-
   .page {
     flex: calc(50% - 20px) 0 0;
   }
 }
 
 @media(max-width: 568px) {
-  .swiper-wrapper {
-    margin-left: calc(-1 * 100% * 4);
-  }
-  
   .page {
     flex: calc(100% - 20px) 0 0;
   }

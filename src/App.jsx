@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import './App.css'
 import { v4 as uuidv4 } from 'uuid';
 const source = [
@@ -57,6 +57,7 @@ function App() {
     anchorPoint.current = index
     directionRef.current = direction
     swiperContainerRef.current.style.transform = `translateX(${anchorPoint.current * -firstChildWidth.current}px)`
+    console.log('anchorPoint? ', anchorPoint.current)
   }
 
   const dragStart = (e) => {
@@ -99,15 +100,16 @@ function App() {
     console.log('left? ', Math.round(Math.abs(swiperContainerRef.current.getBoundingClientRect().left)))
     console.log('right? ', Math.round(Math.abs(swiperContainerRef.current.style.right)))
     console.log('width? ', Math.round(Math.abs(swiperContainerRef.current.clientWidth)))
-    console.log('scrollLeft ', swiperContainerRef.current.style.transform)
+    console.log('scrollLeft ', swiperContainerRef.current.style.transform, swiperContainerRef.current.style.transform.split(/ /)[0].replace(/[^-.0-9]/g, ''))
     console.log('scrollWidth ', swiperContainerRef.current.scrollWidth)
     console.groupEnd()
+
+    const calCurrentPos = Math.round(Math.abs(swiperContainerRef.current.getBoundingClientRect().left)) + Math.round(Math.abs(swiperContainerRef.current.clientWidth))
     if(
       directionRef.current === 'next' && 
-      Math.round(Math.abs(swiperContainerRef.current.getBoundingClientRect().left)) === Math.round(Math.abs(swiperContainerRef.current.getBoundingClientRect().width))
+      swiperContainerRef.current.scrollWidth - 5 <= calCurrentPos &&  calCurrentPos <= swiperContainerRef.current.scrollWidth + 5
     ) {
       // if swiperContainer touched its right end, this block will be processed
-      console.log('right end')
       swiperContainerRef.current.style.transition = 'none';
       const shiftDistance = swiperContainerRef.current.getBoundingClientRect().left + 4 * firstChildWidth.current;
       swiperContainerRef.current.style.transform = `translateX(${shiftDistance}px)`;
@@ -122,17 +124,24 @@ function App() {
       swiperContainerRef.current.getBoundingClientRect().left >= 0
     ) {
       // if swiperContainer touched its left end, this block will be processed
-      console.log('leftt end')
+      console.log('left end')
       swiperContainerRef.current.style.transition = 'none';
       const shiftDistance = swiperContainerRef.current.getBoundingClientRect().left - 4 * firstChildWidth.current;
       swiperContainerRef.current.style.transform = `translateX(${shiftDistance}px)`;
 
+
+      console.log('left shift Dis? ', shiftDistance)
       anchorPoint.current += 4;
       setTimeout(() => {
         swiperContainerRef.current.style.transition = 'transform .5s';
       }, 0)
     }
   }
+
+  useLayoutEffect(() => {
+    // firstChildWidth.current = swiperContainerRef.current.children[0].getBoundingClientRect().width;
+    // swiperContainerRef.current.style.transform = `translateX(${anchorPoint.current * -firstChildWidth.current}px)`; 
+  }, [])
 
   useEffect(() => {
     containerRef.current.addEventListener('mousedown', dragStart)
